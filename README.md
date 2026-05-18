@@ -52,7 +52,7 @@ npm run dev
 You should see:
 ```
 ✅ MySQL connected successfully
-✅ Server running on http://localhost:5000
+✅ Server running on http://localhost:5001
 ```
 
 ---
@@ -123,8 +123,7 @@ farm-marketplace/
 ---
 
 ## 🧪 Test the API (using Postman or browser)
-- Health check: http://localhost:5000/api/health
-- All listings: http://localhost:5000/api/listings
-- Categories:   http://localhost:5000/api/categories
-# Farm-Marketplace
-# Farm-Marketplace
+- Health check: http://localhost:5001/api/health
+- All listings: http://localhost:5001/api/listings
+- Categories:   http://localhost:5001/api/categories
+
