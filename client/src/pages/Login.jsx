@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import { API_URL } from '../config';
 
 // ── SVG Brand Icons ─────────────────────────────────────────
 const GoogleIcon = () => (
@@ -192,7 +193,7 @@ export default function Login() {
 
   const handleOAuth = (provider) => { setOauthProvider(provider); setOauthRole('buyer'); setOauthModal(true); };
   const handleOAuthContinue = () => {
-    const base = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+    const base = API_URL;
     window.location.href = `${base}/api/auth/${oauthProvider.toLowerCase()}?role=${oauthRole}`;
   };
 

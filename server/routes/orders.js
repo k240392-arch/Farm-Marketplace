@@ -3,7 +3,7 @@ const express  = require('express');
 const router   = express.Router();
 const db       = require('../config/db');
 const { protect, farmerOnly } = require('../middleware/authMiddleware');
-const { sendOrderConfirmation, sendFarmerOrderAlert, sendStatusUpdate } = require('../config/email');
+const { sendOrderConfirmation, sendFarmerOrderAlert, sendStatusUpdate, sendAdminOrderAlert } = require('../config/email');
 
 // ── Auto-ensure schema for commission ledger ──────────────
 // Runs once at module load. Idempotent — safe to call repeatedly.
@@ -222,6 +222,10 @@ router.post('/', protect, async (req, res) => {
     if (buyer.length) {
       sendOrderConfirmation(buyer[0].email, buyer[0].full_name, { order_id, total_amount: total.toFixed(2), delivery_address, items: enriched })
         .catch(e => console.log('Buyer email failed:', e.message));
+
+      // Notify admin of every new order (fire-and-forget)
+      sendAdminOrderAlert(buyer[0], { order_id, total_amount: total.toFixed(2), delivery_address, items: enriched })
+        .catch(e => console.log('Admin order alert failed:', e.message));
     }
     farmerEmails.forEach(farmer => {
       sendFarmerOrderAlert(farmer.email, farmer.name, { order_id, total_amount: total.toFixed(2), delivery_address, items: farmer.items })

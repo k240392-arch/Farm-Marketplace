@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api';
+import { API_URL } from '../config';
 
 const GoogleIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" style={{ flexShrink:0 }}>
@@ -75,7 +76,7 @@ export default function Register() {
   };
 
   const handleOAuthContinue = () => {
-    const base = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+    const base = API_URL;
     window.location.href = `${base}/api/auth/${oauthProvider.toLowerCase()}?role=${oauthRole}`;
   };
 

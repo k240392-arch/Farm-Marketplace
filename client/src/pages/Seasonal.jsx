@@ -1,15 +1,10 @@
-// pages/Seasonal.jsx — Catalog-driven seasonal page (Amazon-style)
-// Author: CPRO306 Capstone | Date: 2026
-//
-// v3 — All products come from /api/products/seasonal.
-// Products always show, even with zero farmer offers ("Currently unavailable").
-// Add-to-cart adds the cheapest farmer's listing.
 
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import { API_URL } from '../config';
 
 const C = {
   forest: '#253528', moss: '#3D5B45', sage: '#A7BFA5',
@@ -30,7 +25,7 @@ const CartIcon = ({ size = 16 }) => (
 const getImg = (image_url) => {
   if (!image_url) return FALLBACK_PRODUCE;
   if (image_url.startsWith('http')) return image_url;
-  return `http://localhost:5001${image_url}`;
+  return `${API_URL}${image_url}`;
 };
 
 const SEASON_THEMES = {

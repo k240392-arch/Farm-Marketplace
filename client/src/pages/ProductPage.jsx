@@ -10,6 +10,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import { API_URL } from '../config';
 
 const C = {
   forest: '#253528', moss: '#3D5B45', sage: '#A7BFA5',
@@ -23,7 +24,7 @@ const FALLBACK = 'https://images.unsplash.com/photo-1488459716781-31db52582fe9?w
 const getImg = (url) => {
   if (!url) return FALLBACK;
   if (url.startsWith('http')) return url;
-  return `http://localhost:5001${url}`;
+  return `${API_URL}${url}`;
 };
 
 const I = ({ children, size = 18, sw = 2 }) => (

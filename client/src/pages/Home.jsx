@@ -6,6 +6,7 @@ import { useWishlist } from '../context/WishlistContext';
 import { getProduceImage } from '../utils/produceImage';
 import PromoPopup from '../components/PromoPopup';
 import FeedbackWidget from '../components/FeedbackWidget';
+import { API_URL } from '../config';
 
 // ──────────────────────────────────────────────────────────────
 // PALETTE  (matches zip's design tokens — see styles/theme.css)
@@ -63,7 +64,7 @@ const MailIcon      = (p) => <Icon {...p}><rect width="20" height="16" x="2" y="
 const getImg = (image_url) => {
   if (!image_url) return 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=600';
   if (image_url.startsWith('http')) return image_url;
-  return `http://localhost:5001${image_url}`;
+  return `${API_URL}${image_url}`;
 };
 
 // ══════════════════════════════════════════════════════════════

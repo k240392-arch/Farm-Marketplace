@@ -1,0 +1,251 @@
+html, body {
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
+img, video, svg {
+  max-width: 100%;
+  height: auto;
+}
+
+#root { min-width: 0; }
+
+
+/* ─────────────────────────────────────────────────────────────
+   2. RESPONSIVE CONTAINER
+   ───────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .container { padding: 0 16px !important; }
+}
+@media (max-width: 480px) {
+  .container { padding: 0 12px !important; }
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   3. TABLET PORTRAIT  (≤ 900px)
+   Most 2-column page layouts collapse here.
+   ───────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+
+  /* Generic 2-column grids → 1 column */
+  [style*="gridTemplateColumns:'1fr 1fr'"],
+  [style*="gridTemplateColumns: '1fr 1fr'"],
+  [style*="grid-template-columns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* 3-column grids → 2 columns */
+  [style*="gridTemplateColumns:'1fr 1fr 1fr'"],
+  [style*="gridTemplateColumns: '1fr 1fr 1fr'"],
+  [style*="gridTemplateColumns:'repeat(3,1fr)'"],
+  [style*="gridTemplateColumns: 'repeat(3,1fr)'"],
+  [style*="gridTemplateColumns: 'repeat(3, 1fr)'"] {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* 4 / 5-column grids → 2 columns */
+  [style*="gridTemplateColumns:'1fr 1fr 1fr 1fr'"],
+  [style*="gridTemplateColumns: '1fr 1fr 1fr 1fr'"],
+  [style*="gridTemplateColumns:'1fr 1fr 1fr 1fr 1fr'"],
+  [style*="gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr'"] {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   4. MOBILE  (≤ 640px – phones)
+   ───────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+
+  /* Any 2/3/4/5-column grid → 1 column */
+  [style*="gridTemplateColumns:'1fr 1fr'"],
+  [style*="gridTemplateColumns: '1fr 1fr'"],
+  [style*="gridTemplateColumns:'1fr 1fr 1fr'"],
+  [style*="gridTemplateColumns: '1fr 1fr 1fr'"],
+  [style*="gridTemplateColumns:'1fr 1fr 1fr 1fr'"],
+  [style*="gridTemplateColumns: '1fr 1fr 1fr 1fr'"],
+  [style*="gridTemplateColumns:'1fr 1fr 1fr 1fr 1fr'"],
+  [style*="gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr'"],
+  [style*="gridTemplateColumns:'repeat(3,1fr)'"],
+  [style*="gridTemplateColumns: 'repeat(3,1fr)'"],
+  [style*="gridTemplateColumns: 'repeat(3, 1fr)'"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Auto-fill grids with minmax: drop the min so they fit phones */
+  [style*="minmax(280px"], [style*="minmax(260px"],
+  [style*="minmax(240px"], [style*="minmax(220px"],
+  [style*="minmax(200px"], [style*="minmax(180px"],
+  [style*="minmax(170px"], [style*="minmax(160px"],
+  [style*="minmax(155px"], [style*="minmax(150px"],
+  [style*="minmax(140px"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Hero / huge titles: scale down */
+  h1 { font-size: 32px !important; line-height: 1.2 !important; }
+  h2 { font-size: 24px !important; line-height: 1.25 !important; }
+  h3 { font-size: 19px !important; }
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   5. CHECKOUT — fix the un-wrapping flex layout
+   Targets the .checkout-layout class added to Checkout.jsx.
+   ───────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .checkout-layout  { flex-wrap: wrap !important; }
+  .checkout-right   { width: 100% !important; position: static !important; }
+  .checkout-left    { width: 100% !important; }
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   6. CART — items already wrap, but tighten on phones
+   ───────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .fm-cart-item-row {
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+  }
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   7. MODALS — make them mobile-safe
+   ───────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  /* Tighten overlay padding so the modal can take the full screen */
+  [style*="position:'fixed'"][style*="inset:0"],
+  [style*="position: 'fixed'"][style*="inset: 0"] {
+    padding: 12px !important;
+  }
+
+  /* Modals with big inner padding: shrink */
+  [style*="padding:'56px 48px'"],
+  [style*="padding: '56px 48px'"] { padding: 32px 20px !important; }
+  [style*="padding:'40px 32px'"],
+  [style*="padding: '40px 32px'"] { padding: 28px 18px !important; }
+  [style*="padding:'32px 28px'"],
+  [style*="padding: '32px 28px'"] { padding: 22px 16px !important; }
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   8. DASHBOARD SIDEBARS — off-canvas drawer on mobile
+   The three dashboards add classNames after the patches.
+   ───────────────────────────────────────────────────────────── */
+.dash-shell           { display: flex; min-height: 100vh; }
+.dash-hamburger       { display: none; }
+.dash-mobile-backdrop { display: none; }
+
+@media (max-width: 900px) {
+  /* Show the hamburger button */
+  .dash-hamburger {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    border: 1px solid #E5E7EB;
+    background: #fff;
+    cursor: pointer;
+    font-size: 22px;
+    line-height: 1;
+    margin-right: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    color: #111827;
+  }
+
+  /* Sidebar becomes an off-canvas drawer */
+  .dash-sidebar {
+    position: fixed !important;
+    left: 0; top: 0;
+    height: 100vh !important;
+    width: 260px !important;
+    z-index: 1000;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease !important;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.2);
+  }
+
+  /* When shell has .dash-mobile-open, slide drawer in */
+  .dash-shell.dash-mobile-open .dash-sidebar {
+    transform: translateX(0);
+  }
+
+  /* Backdrop behind the open drawer */
+  .dash-shell.dash-mobile-open .dash-mobile-backdrop {
+    display: block !important;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 999;
+  }
+
+  /* Main content full width */
+  .dash-main {
+    width: 100% !important;
+    padding: 16px 14px !important;
+  }
+
+  /* In-page secondary nav: stack above */
+  .dash-snav {
+    width: 100% !important;
+    position: static !important;
+    margin-bottom: 16px;
+  }
+
+  .dash-settings-layout { flex-direction: column !important; }
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   9. PRODUCT DETAIL — image column shouldn't lock at 480px
+   ───────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  [style*="flex: '0 0 480px'"],
+  [style*="flex:'0 0 480px'"] {
+    flex: 1 1 100% !important;
+  }
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   10. TABLES — horizontally scroll on phones
+   ───────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   11. NAVBAR — tighten inner padding on phones
+   ───────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  [style*="padding: '0 32px'"][style*="height: 76"] {
+    padding: 0 14px !important;
+  }
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   12. FLOATING WIDGETS — chatbot, feedback, promo popup
+   ───────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  [style*="position:'fixed'"][style*="bottom:"][style*="right:"] {
+    max-width: calc(100vw - 24px);
+  }
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   13. PRINT
+   ───────────────────────────────────────────────────────────── */
+@media print {
+  .dash-sidebar, .dash-hamburger, .dash-mobile-backdrop, footer {
+    display: none !important;
+  }
+}

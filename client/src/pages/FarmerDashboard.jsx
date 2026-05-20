@@ -8,6 +8,7 @@ import FarmerOrders from './FarmerOrders';
 import FarmerEarnings from '../components/FarmerEarnings';
 import AccountClosure from '../components/AccountClosure';
 import ChangeEmail from '../components/ChangeEmail';
+import { API_URL } from '../config';
 
 // shared settings styles
 const SS = {
@@ -86,8 +87,8 @@ function FarmerSettings({
   ];
 
   return (
-    <div style={SS.wrap}>
-      <div style={SS.snav}>
+    <div style={SS.wrap} className="dash-settings-layout">
+      <div style={SS.snav} className="dash-snav">
         <p style={SS.snavTitle}>Settings</p>
         {sections.map(({ k, icon, label }) => (
           <button key={k} onClick={() => setSec(k)} style={{ ...SS.snavBtn, ...(sec === k ? SS.snavAct : {}) }}>
@@ -303,6 +304,7 @@ export default function FarmerDashboard() {
   const [restockQty,   setRestockQty]  = useState('');
   const [restockLoading, setRestockLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const [form, setForm] = useState({ product_id:'',title:'',description:'',price:'',quantity:'',unit:'kg',category_id:'',location:'',image:null,is_active:1 });
   const [catalogProducts, setCatalogProducts] = useState([]);
@@ -533,10 +535,12 @@ export default function FarmerDashboard() {
   ];
 
   return (
-    <div style={S.shell}>
+    <div style={S.shell} className={`dash-shell${mobileNavOpen ? ' dash-mobile-open' : ''}`}>
+
+      <div className="dash-mobile-backdrop" onClick={() => setMobileNavOpen(false)} />
 
       {/* SIDEBAR */}
-      <aside style={{...S.sidebar, width:sidebarOpen?240:68}}>
+      <aside className="dash-sidebar" style={{...S.sidebar, width:sidebarOpen?240:68}}>
         <div style={S.sideTop}>
           {sidebarOpen && (
             <div style={S.profile}>
@@ -593,9 +597,14 @@ export default function FarmerDashboard() {
       </aside>
 
       {/* MAIN */}
-      <div style={S.main}>
+      <div style={S.main} className="dash-main">
         <div style={S.topBar}>
-          <div>
+          <div style={{ display: 'flex', alignItems: 'center', flex: 1, minWidth: 0 }}>
+            <button
+              className="dash-hamburger"
+              onClick={() => setMobileNavOpen(true)}
+              aria-label="Open menu">☰</button>
+            <div style={{ minWidth: 0 }}>
             <h1 style={S.pageTitle}>
               {tab==='overview'&&'📊 Overview'}{tab==='listings'&&'📋 My Listings'}
               {tab==='add'&&(editId?'✏️ Edit Listing':'➕ Add New Listing')}{tab==='orders'&&'📦 Orders'}{tab==='earnings'&&'💰 Earnings'}{tab==='settings'&&'⚙️ Settings'}
@@ -606,6 +615,7 @@ export default function FarmerDashboard() {
               {tab==='earnings'&&'Net earnings, pending payouts, and platform commission breakdown'}
               {tab==='settings'&&'Manage your account, farm and preferences'}
             </p>
+          </div>
           </div>
           {tab==='listings' && <button style={S.primaryBtn} onClick={()=>{resetForm();setTab('add');}}>+ Add Listing</button>}
         </div>
@@ -628,7 +638,7 @@ export default function FarmerDashboard() {
                 <div style={S.cardHead}><h3 style={S.cardTitle}>Recent Listings</h3><button style={S.cardLink} onClick={()=>setTab('listings')}>View all →</button></div>
                 {listings.slice(0,5).map((l,i)=>(
                   <div key={l.listing_id} style={{...S.listRow,borderTop:i===0?'1px solid #F3F4F6':'none'}}>
-                    {l.image_url?<img src={l.image_url.startsWith('http')?l.image_url:`http://localhost:5001${l.image_url}`} alt={l.title} style={S.rowImg} onError={e=>{e.target.style.display='none';}}/>:<div style={S.rowImgPh}>🥦</div>}
+                    {l.image_url?<img src={l.image_url.startsWith('http')?l.image_url:`${API_URL}${l.image_url}`} alt={l.title} style={S.rowImg} onError={e=>{e.target.style.display='none';}}/>:<div style={S.rowImgPh}>🥦</div>}
                     <div style={{flex:1,minWidth:0}}><p style={S.rowName}>{l.title}</p><p style={S.rowMeta}>{l.category_name} · ${Number(l.price).toFixed(2)}/{l.unit}</p></div>
                     <div style={{textAlign:'right',flexShrink:0}}>
                       <p style={{fontSize:14,fontWeight:700,color:l.quantity<5?'#DC2626':'#059669',margin:0}}>{l.quantity} {l.unit}</p>
@@ -654,7 +664,7 @@ export default function FarmerDashboard() {
                       <tr key={l.listing_id} style={{background:i%2===0?'#fff':'#FAFAFA'}}>
                         <td style={S.td}>
                           <div style={{display:'flex',alignItems:'center',gap:10}}>
-                            {l.image_url?<img src={l.image_url.startsWith('http')?l.image_url:`http://localhost:5001${l.image_url}`} alt={l.title} style={S.tableImg} onError={e=>{e.target.style.display='none';}}/>:<div style={S.tableImgBlank}>🥦</div>}
+                            {l.image_url?<img src={l.image_url.startsWith('http')?l.image_url:`${API_URL}${l.image_url}`} alt={l.title} style={S.tableImg} onError={e=>{e.target.style.display='none';}}/>:<div style={S.tableImgBlank}>🥦</div>}
                             <span style={{fontWeight:600,fontSize:14,color:'#111827'}}>{l.title}</span>
                           </div>
                         </td>

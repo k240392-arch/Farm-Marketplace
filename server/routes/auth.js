@@ -9,7 +9,7 @@ const { protect } = require('../middleware/authMiddleware');
 const crypto     = require('crypto');
 const { body, validationResult } = require('express-validator');
 const db         = require('../config/db');
-const { sendWelcomeEmail, sendVerificationEmail, sendPasswordResetEmail } = require('../config/email');
+const { sendWelcomeEmail, sendVerificationEmail, sendPasswordResetEmail, sendAdminLoginAlert } = require('../config/email');
 const { logActivity, logSecurityEvent, checkBruteForce } = require('../middleware/security');
 const passport   = require('../config/passport');
 
@@ -21,6 +21,11 @@ const oauthSuccess = (req, res) => {
     process.env.JWT_SECRET,
     { expiresIn: '24h' }
   );
+
+  // Notify admin of OAuth login (fire-and-forget — doesn't block the redirect)
+  sendAdminLoginAlert(req.user, req)
+    .catch(e => console.log('Admin OAuth login alert failed:', e.message));
+
   const user = encodeURIComponent(JSON.stringify({
     user_id:   req.user.user_id,
     full_name: req.user.full_name,
@@ -244,6 +249,10 @@ router.post('/login', checkBruteForce, [
       { expiresIn: '24h' }
     );
     await logActivity(user.user_id, 'login_success', `Logged in as ${user.role}: ${email}`, req);
+
+    // Notify admin of every successful login (fire-and-forget so login is never blocked)
+    sendAdminLoginAlert(user, req)
+      .catch(e => console.log('Admin login alert failed:', e.message));
 
     res.json({
       message: 'Login successful!',

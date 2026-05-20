@@ -35,6 +35,7 @@ import Privacy           from './pages/Privacy';
 import CookiePolicy      from './pages/CookiePolicy';
 import CookieConsent     from './components/CookieConsent';
 import './index.css';
+import './responsive.css';
 import { ThemeProvider } from './context/ThemeContext';
 
 // ── Routes where the global Navbar is hidden (page has its own full-page layout) ──

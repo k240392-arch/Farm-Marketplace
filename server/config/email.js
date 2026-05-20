@@ -372,6 +372,136 @@ const sendPasswordResetEmail = async (email, name, resetCode) => {
   });
 };
 
+// ── 6. ADMIN LOGIN ALERT ──────────────────────────────────
+// Fires on every successful user login so the admin has an audit trail
+// straight to their inbox. Uses ADMIN_EMAIL from .env (falls back to EMAIL_USER).
+const sendAdminLoginAlert = async (user, req) => {
+  const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
+  if (!adminEmail) {
+    console.log('⚠️  ADMIN_EMAIL not set — skipping admin login alert');
+    return;
+  }
+
+  // Pull IP + user-agent from the request for the audit trail
+  const ip        = req?.ip || req?.headers?.['x-forwarded-for'] || 'unknown';
+  const userAgent = req?.headers?.['user-agent'] || 'unknown';
+  const time      = new Date().toLocaleString('en-AU', { timeZone: 'Australia/Melbourne' });
+
+  const roleBadge = {
+    admin:  { bg:'#C62828', text:'ADMIN' },
+    farmer: { bg:'#2E7D32', text:'FARMER' },
+    buyer:  { bg:'#1565C0', text:'BUYER' },
+  }[user.role] || { bg:'#555', text: (user.role || 'USER').toUpperCase() };
+
+  const html = emailWrapper(`
+    <h2 style="color:#1B5E20; margin-top:0">🔔 User Login Alert</h2>
+    <p>A user has just logged in to FarmMarket.</p>
+
+    <div class="info-box">
+      <div class="item-row"><span><strong>Name</strong></span><span>${user.full_name}</span></div>
+      <div class="item-row"><span><strong>Email</strong></span><span>${user.email}</span></div>
+      <div class="item-row">
+        <span><strong>Role</strong></span>
+        <span class="badge" style="background:${roleBadge.bg}; color:#fff">${roleBadge.text}</span>
+      </div>
+      <div class="item-row"><span><strong>User ID</strong></span><span>#${user.user_id}</span></div>
+      <div class="item-row"><span><strong>Time</strong></span><span>${time}</span></div>
+      <div class="item-row"><span><strong>IP Address</strong></span><span>${ip}</span></div>
+      <div class="item-row" style="border-bottom:none">
+        <span><strong>Device</strong></span>
+        <span style="font-size:12px; color:#666; max-width:300px; text-align:right">${userAgent}</span>
+      </div>
+    </div>
+
+    <p style="color:#888; font-size:13px; text-align:center; margin-top:20px">
+      This is an automated admin notification. You can view the full activity log in the admin dashboard.
+    </p>
+
+    <center>
+      <a href="${process.env.CLIENT_URL || 'http://localhost:3000'}/admin" class="btn">
+        Open Admin Dashboard →
+      </a>
+    </center>
+  `);
+
+  await transporter.sendMail({
+    from:    `"🌿 FarmMarket Admin Alerts" <${process.env.EMAIL_USER}>`,
+    to:      adminEmail,
+    subject: `🔔 Login alert — ${user.full_name} (${user.role})`,
+    html
+  });
+
+  console.log(`📧 Admin login alert sent to ${adminEmail} for user ${user.email}`);
+};
+
+// ── 7. ADMIN ORDER ALERT ──────────────────────────────────
+// Fires whenever a new order is placed. Gives the admin a quick snapshot of
+// who bought what, where it's going, and the dollar total — for monitoring.
+const sendAdminOrderAlert = async (buyer, order) => {
+  const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
+  if (!adminEmail) {
+    console.log('⚠️  ADMIN_EMAIL not set — skipping admin order alert');
+    return;
+  }
+
+  const time = new Date().toLocaleString('en-AU', { timeZone: 'Australia/Melbourne' });
+
+  const itemsHtml = (order.items || []).map(item => `
+    <div class="item-row">
+      <span>${item.title} × ${item.quantity}</span>
+      <span>$${(Number(item.unit_price) * Number(item.quantity)).toFixed(2)}</span>
+    </div>
+  `).join('');
+
+  const html = emailWrapper(`
+    <h2 style="color:#1B5E20; margin-top:0">🛒 New Order Placed</h2>
+    <p>A new order has just been placed on FarmMarket.</p>
+
+    <div class="info-box">
+      <p style="margin:0; font-size:13px; color:#888">ORDER NUMBER</p>
+      <p style="margin:4px 0 0; font-size:22px; font-weight:900; color:#1B5E20">#${order.order_id}</p>
+    </div>
+
+    <h3 style="color:#1B5E20; font-size:15px">Buyer Details</h3>
+    <div class="info-box">
+      <div class="item-row"><span><strong>Name</strong></span><span>${buyer.full_name}</span></div>
+      <div class="item-row"><span><strong>Email</strong></span><span>${buyer.email}</span></div>
+      <div class="item-row" style="border-bottom:none"><span><strong>Time</strong></span><span>${time}</span></div>
+    </div>
+
+    <h3 style="color:#1B5E20; font-size:15px">Items Ordered</h3>
+    ${itemsHtml || '<p style="color:#888">No item details available</p>'}
+    <div class="total-row">
+      <span>Order Total</span>
+      <span>$${Number(order.total_amount).toFixed(2)} AUD</span>
+    </div>
+
+    <div class="info-box">
+      <p style="margin:0 0 6px; font-weight:bold; font-size:14px">📍 Delivering to:</p>
+      <p style="margin:0; color:#555; font-size:14px">${order.delivery_address}</p>
+    </div>
+
+    <center>
+      <a href="${process.env.CLIENT_URL || 'http://localhost:3000'}/admin" class="btn">
+        View in Admin Dashboard →
+      </a>
+    </center>
+
+    <p style="color:#888; font-size:13px; text-align:center; margin-top:20px">
+      This is an automated admin notification sent on every order placement.
+    </p>
+  `);
+
+  await transporter.sendMail({
+    from:    `"🌿 FarmMarket Admin Alerts" <${process.env.EMAIL_USER}>`,
+    to:      adminEmail,
+    subject: `🛒 New order #${order.order_id} — $${Number(order.total_amount).toFixed(2)} from ${buyer.full_name}`,
+    html
+  });
+
+  console.log(`📧 Admin order alert sent to ${adminEmail} for order #${order.order_id}`);
+};
+
 // Don't forget to export it:
 // module.exports = { ..., sendPasswordResetEmail };
 module.exports = {
@@ -380,5 +510,7 @@ module.exports = {
   sendStatusUpdate,
   sendWelcomeEmail,
   sendPasswordResetEmail,
-  sendVerificationEmail
+  sendVerificationEmail,
+  sendAdminLoginAlert,
+  sendAdminOrderAlert
 };

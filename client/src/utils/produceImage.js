@@ -1,3 +1,4 @@
+import { API_URL } from '../config';
 
 const POOLS = {
   vegetables: [
@@ -147,7 +148,7 @@ export function getProduceImage(listing, size = 600) {
   const url = listing.image_url || listing.default_image;
   if (url) {
     if (url.startsWith('http')) return url;
-    return `http://localhost:5001${url}`;
+    return `${API_URL}${url}`;
   }
 
   // 2) Pick a category-appropriate Unsplash photo, varied per listing
@@ -165,7 +166,7 @@ export function getImageSrc(image_url) {
     return `https://images.unsplash.com/${POOLS.generic[0]}?w=600&auto=format&fit=crop&q=80`;
   }
   if (image_url.startsWith('http')) return image_url;
-  return `http://localhost:5001${image_url}`;
+  return `${API_URL}${image_url}`;
 }
 
 export default getProduceImage;

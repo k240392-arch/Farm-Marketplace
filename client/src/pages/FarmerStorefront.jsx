@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useCart } from '../context/CartContext';
+import { API_URL } from '../config';
 
 // Palette consistent with Farmers.jsx
 const C = {
@@ -100,7 +101,7 @@ export default function FarmerStorefront() {
   const heroPhoto = farmer.profile_image
     ? (farmer.profile_image.startsWith('http')
         ? farmer.profile_image
-        : `http://localhost:5001${farmer.profile_image}`)
+        : `${API_URL}${farmer.profile_image}`)
     : photoFor(farmer.user_id);
 
   return (
@@ -162,7 +163,7 @@ export default function FarmerStorefront() {
                        onClick={() => navigate(`/listings/${l.listing_id}`)}>
                     <img
                       src={l.image_url
-                        ? (l.image_url.startsWith('http') ? l.image_url : `http://localhost:5001${l.image_url}`)
+                        ? (l.image_url.startsWith('http') ? l.image_url : `${API_URL}${l.image_url}`)
                         : 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&q=70'}
                       alt={l.title}
                       style={S.cardImg}

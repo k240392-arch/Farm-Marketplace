@@ -7,9 +7,7 @@ import api from '../services/api';
 import AdminBot from '../components/AdminBot';
 import UserHistoryModal from '../components/UserHistoryModal';
 import ChangeEmail from '../components/ChangeEmail';
-
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
-
+import { API_URL } from '../config';
 // ─── Shared mini-components ────────────────────────
 function Toggle({ on, onClick }) {
   return (
@@ -66,6 +64,7 @@ export default function AdminDashboard() {
 
   const [tab,        setTab]        = useState('overview');
   const [sidebar,    setSidebar]    = useState(true);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [toast,      setToast]      = useState(null);
   const [loading,    setLoading]    = useState(false);
 
@@ -336,10 +335,12 @@ export default function AdminDashboard() {
   const totalRevenue     = parseFloat(stats?.orders?.total_revenue || 0);
 
   return (
-    <div style={S.shell}>
+    <div style={S.shell} className={`dash-shell${mobileNavOpen ? ' dash-mobile-open' : ''}`}>
+
+      <div className="dash-mobile-backdrop" onClick={() => setMobileNavOpen(false)} />
 
       {/* ══ SIDEBAR ══ */}
-      <aside style={{ ...S.sidebar, width: sidebar ? 240 : 68 }}>
+      <aside className="dash-sidebar" style={{ ...S.sidebar, width: sidebar ? 240 : 68 }}>
 
         {/* Brand */}
         <div style={S.brand}>
@@ -424,11 +425,16 @@ export default function AdminDashboard() {
       </aside>
 
       {/* ══ MAIN ══ */}
-      <div style={S.main}>
+      <div style={S.main} className="dash-main">
 
         {/* Top bar */}
         <div style={S.topBar}>
-          <div>
+          <div style={{ display: 'flex', alignItems: 'center', flex: 1, minWidth: 0 }}>
+            <button
+              className="dash-hamburger"
+              onClick={() => setMobileNavOpen(true)}
+              aria-label="Open menu">☰</button>
+            <div style={{ minWidth: 0 }}>
             <h1 style={S.pageTitle}>
               {NAV.find(n => n.key===tab)?.icon}{' '}
               {NAV.find(n => n.key===tab)?.label}
@@ -445,6 +451,7 @@ export default function AdminDashboard() {
               {tab==='compliance' && 'Australian Privacy Act 1988 — APP compliance'}
               {tab==='settings' && 'Admin account management'}
             </p>
+          </div>
           </div>
           <div style={{ display:'flex', alignItems:'center', gap:10 }}>
             {tab === 'users'    && <button style={S.actionBtn} onClick={loadUsers}>↻ Refresh</button>}
@@ -1183,9 +1190,9 @@ export default function AdminDashboard() {
 
         {/* ══ SETTINGS TAB ══ */}
         {tab === 'settings' && (
-          <div style={{ display:'flex', gap:20, alignItems:'flex-start' }}>
+          <div style={{ display:'flex', gap:20, alignItems:'flex-start' }} className="dash-settings-layout">
             {/* Settings nav */}
-            <div style={{ width:185, background:'#fff', borderRadius:14, padding:12, border:'1px solid #F3F4F6', flexShrink:0, position:'sticky', top:20, boxShadow:'0 1px 3px rgba(0,0,0,0.05)' }}>
+            <div className="dash-snav" style={{ width:185, background:'#fff', borderRadius:14, padding:12, border:'1px solid #F3F4F6', flexShrink:0, position:'sticky', top:20, boxShadow:'0 1px 3px rgba(0,0,0,0.05)' }}>
               <p style={{ fontSize:10, fontWeight:700, color:'#9CA3AF', textTransform:'uppercase', letterSpacing:1, padding:'4px 8px 10px', margin:0 }}>Settings</p>
               {[{k:'profile',icon:'👤',l:'Profile'},{k:'password',icon:'🔒',l:'Password'},{k:'notifs',icon:'🔔',l:'Notifications'},{k:'account',icon:'ℹ️',l:'Account Info'},{k:'danger',icon:'⚠️',l:'Danger Zone'}].map(({k,icon,l}) => (
                 <button key={k} onClick={() => setAppear(a => ({...a, _sec:k}))}

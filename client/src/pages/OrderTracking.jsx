@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { API_URL } from '../config';
 
 export default function OrderTracking() {
   const { id }    = useParams();
@@ -149,7 +150,7 @@ export default function OrderTracking() {
                 }}>
                   <img
                     src={item.image_url
-                      ? (item.image_url.startsWith('http') ? item.image_url : `http://localhost:5001${item.image_url}`)
+                      ? (item.image_url.startsWith('http') ? item.image_url : `${API_URL}${item.image_url}`)
                       : 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=100'}
                     alt={item.title}
                     style={styles.itemImg}

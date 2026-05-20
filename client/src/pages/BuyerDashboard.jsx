@@ -6,9 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
-
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
-
+import { API_URL } from '../config';
 // Single shared Stripe promise (reused by checkout and add-card)
 const stripePromise = loadStripe(
   process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY ||
@@ -201,9 +199,9 @@ function BuyerSettings({
   const totalSpent = delivered.reduce((s, o) => s + parseFloat(o.total_amount || 0), 0);
 
   return (
-    <div style={SS.wrap}>
+    <div style={SS.wrap} className="dash-settings-layout">
       {/* Settings nav */}
-      <div style={SS.snav}>
+      <div style={SS.snav} className="dash-snav">
         <p style={SS.snavTitle}>Settings</p>
         {sections.map(({ k, icon, label }) => (
           <button key={k} onClick={() => setSec(k)} style={{ ...SS.snavBtn, ...(sec === k ? SS.snavAct : {}) }}>
@@ -491,6 +489,7 @@ export default function BuyerDashboard() {
 
   const [tab,         setTab]         = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [toast,       setToast]       = useState(null);
   const [orders,      setOrders]      = useState([]);
   const [reviews,     setReviews]     = useState([]);
@@ -739,10 +738,13 @@ export default function BuyerDashboard() {
   );
 
   return (
-    <div style={S.shell}>
+    <div style={S.shell} className={`dash-shell${mobileNavOpen ? ' dash-mobile-open' : ''}`}>
+
+      {/* Mobile drawer backdrop */}
+      <div className="dash-mobile-backdrop" onClick={() => setMobileNavOpen(false)} />
 
       {/* ══ SIDEBAR ══ */}
-      <aside style={{ ...S.sidebar, width: sidebarOpen ? 240 : 68 }}>
+      <aside className="dash-sidebar" style={{ ...S.sidebar, width: sidebarOpen ? 240 : 68 }}>
 
         {/* Profile + collapse */}
         <div style={S.sideTop}>
@@ -813,11 +815,16 @@ export default function BuyerDashboard() {
       </aside>
 
       {/* ══ MAIN ══ */}
-      <div style={S.main}>
+      <div style={S.main} className="dash-main">
 
         {/* Top bar */}
         <div style={S.topBar}>
-          <div>
+          <div style={{ display: 'flex', alignItems: 'center', flex: 1, minWidth: 0 }}>
+            <button
+              className="dash-hamburger"
+              onClick={() => setMobileNavOpen(true)}
+              aria-label="Open menu">☰</button>
+            <div style={{ minWidth: 0 }}>
             <h1 style={S.pageTitle}>
               {tab === 'overview' && '📊 Overview'}
               {tab === 'orders'   && '📦 My Orders'}
@@ -832,6 +839,7 @@ export default function BuyerDashboard() {
               {tab === 'reviews'  && `${reviews.length} review${reviews.length !== 1 ? 's' : ''} submitted`}
               {tab === 'settings' && 'Manage your account and preferences'}
             </p>
+          </div>
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
             {tab === 'orders' && (

@@ -1,6 +1,7 @@
 // pages/Cart.jsx
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { API_URL } from '../config';
 
 const GST_RATE = 0.10; // 10% Australian GST
 
@@ -37,13 +38,13 @@ export default function Cart() {
           {/* ── Cart Items ── */}
           <div style={{ flex:1, minWidth:0 }}>
             {cart.map(item => (
-              <div key={item.listing_id} style={S.itemCard}>
+              <div key={item.listing_id} style={S.itemCard} className="fm-cart-item-row">
                 <img
                   src={
                     item.image_url && item.image_url.startsWith('http')
                       ? item.image_url
                       : item.image_url && item.image_url.startsWith('/')
-                      ? `http://localhost:5001${item.image_url}`
+                      ? `${API_URL}${item.image_url}`
                       : 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=200'
                   }
                   alt={item.title}

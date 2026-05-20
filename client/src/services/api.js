@@ -2,9 +2,10 @@
 // Axios instance with JWT auto-attach
 
 import axios from 'axios';
+import { API_URL } from '../config';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5001/api',
+  baseURL: `${API_URL}/api`,
   headers: { 'Content-Type': 'application/json' }
 });
 

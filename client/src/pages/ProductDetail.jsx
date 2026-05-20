@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { API_URL } from '../config';
 
 export default function ProductDetail() {
   const { id }  = useParams();
@@ -67,7 +68,7 @@ export default function ProductDetail() {
   const imgSrc = listing.image_url
     ? (listing.image_url.startsWith('http')
         ? listing.image_url
-        : `http://localhost:5001${listing.image_url}`)
+        : `${API_URL}${listing.image_url}`)
     : `https://images.unsplash.com/photo-1540420773420-3366772f4999?w=600`;
 
   return (
