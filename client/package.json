@@ -11,7 +11,6 @@
     "react-router-dom": "^6.21.3",
     "react-scripts": "^5.0.1"
   },
-
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build"
@@ -25,5 +24,6 @@
     "development": [
       "last 1 chrome version"
     ]
-  }
+  },
+  "_buildTimestamp": "1779740047"
 }
