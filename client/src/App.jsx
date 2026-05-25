@@ -1,4 +1,3 @@
-import './responsive.css';
 // App.jsx — Farm Produce Marketplace routing
 // Author: CPRO306 Capstone Project | Date: 2026
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
