@@ -85,17 +85,21 @@ export default function OrderSuccess() {
   <p class="section-title">Items Ordered</p>
   <table>
     <thead>
-      <tr><th>Product</th><th>Qty</th><th>Unit Price</th><th>Amount</th></tr>
+      <tr><th>Product</th><th>Farmer</th><th>Qty</th><th>Unit Price</th><th>Amount</th></tr>
     </thead>
     <tbody>
-      ${(order?.items || []).map(item => `
+      ${(order?.items || []).map(item => {
+        const unitPrice = parseFloat(item.unit_price ?? item.price ?? 0);
+        const qty       = parseFloat(item.quantity || 1);
+        return `
         <tr>
           <td>${item.title || item.product_name || 'Product'}</td>
+          <td>${item.farmer_name || '—'}</td>
           <td>${item.quantity} ${item.unit || 'kg'}</td>
-          <td>$${parseFloat(item.price || 0).toFixed(2)}</td>
-          <td>$${(parseFloat(item.price || 0) * parseFloat(item.quantity || 1)).toFixed(2)}</td>
-        </tr>
-      `).join('') || `<tr><td colspan="4" style="color:#9CA3AF; padding:16px 0">Order #${id} — See order tracking for details</td></tr>`}
+          <td>$${unitPrice.toFixed(2)}</td>
+          <td>$${(unitPrice * qty).toFixed(2)}</td>
+        </tr>`;
+      }).join('') || `<tr><td colspan="5" style="color:#9CA3AF; padding:16px 0">Order #${id} — See order tracking for details</td></tr>`}
     </tbody>
   </table>
 

@@ -1,9 +1,5 @@
 // pages/Listings.jsx — Catalog-driven browse page (Amazon-style)
-// Author: CPRO306 Capstone | Date: 2026
-//
-// v3 — Now fetches from /api/products (the catalog) instead of /api/listings.
-// Every category is always populated; products with no farmer offers show
-// "Currently unavailable" instead of disappearing.
+
 
 import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
@@ -11,6 +7,7 @@ import api from '../services/api';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { API_URL } from '../config';
+import { getProduceImage } from '../utils/produceImage';
 
 // ── Palette ──
 const C = {
@@ -24,10 +21,24 @@ const SERIF = "'Instrument Serif', 'Cormorant Garamond', Georgia, serif";
 
 const FALLBACK = 'https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=800&auto=format&fit=crop&q=75';
 
-const getImg = (url) => {
-  if (!url) return FALLBACK;
-  if (url.startsWith('http')) return url;
-  return `${API_URL}${url}`;
+// Smart image resolver: use the farmer's/catalog's real image if present,
+// otherwise pick a category- and title-matched photo from the curated pool
+// (so "Rosemary" gets a rosemary photo, not a generic market shot).
+// `product` is the full product object so we can match on name + category.
+const getImg = (product) => {
+  if (!product) return FALLBACK;
+  // Back-compat: callers that still pass a raw URL string
+  if (typeof product === 'string') {
+    if (!product) return FALLBACK;
+    if (product.startsWith('http')) return product;
+    return `${API_URL}${product}`;
+  }
+  return getProduceImage({
+    image_url:     product.image_url,
+    category_name: product.category_name,
+    title:         product.name || product.title,
+    listing_id:    product.product_id || product.listing_id,
+  }, 800);
 };
 
 // ── Inline icons ──
@@ -564,7 +575,7 @@ function CatalogCard({ product, onAddToCart }) {
       <Link to={`/products/${product.slug}`}
         style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
         <div style={S.imgWrap}>
-          <img src={getImg(product.image_url)} alt={product.name}
+          <img src={getImg(product)} alt={product.name}
             onError={e => { e.currentTarget.src = FALLBACK; }}
             loading="lazy" className="ls-img"
             style={S.img}/>
